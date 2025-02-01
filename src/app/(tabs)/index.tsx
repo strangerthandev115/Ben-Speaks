@@ -12,33 +12,65 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Actionbutton from "../action_button";
 import Controlbutton from "../control_buttons";
 import { Dimensions } from "react-native";
-
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
+import {
+  SQLiteProvider,
+  useSQLiteContext,
+  type SQLiteDatabase,
+  openDatabaseAsync,
+} from "expo-sqlite";
+import { Suspense } from "react";
 
 const Separator = () => <View style={styles.separator} />;
 
-const rows = [4];
-const colums = [12];
-
 const action_names = ["NEW", "FOOD", "WATER", "WALK"];
+
+const migrateDbIfNeeded = async (db: SQLiteDatabase) => {
+  const DATABASE_VERSION = 1; //Increase by 1 after you add new migration
+  let user_version = await db.getFirstAsync<{
+    user_version: number;
+  }>("PRAGMA user_version");
+  console.log(user_version);
+  if (user_version != null) {
+    let currentDbVersion = user_version.user_version;
+
+    if (currentDbVersion >= DATABASE_VERSION) {
+      return;
+    }
+    if (currentDbVersion === 0) {
+      await db.execAsync(`
+PRAGMA journal_mode = 'wal';
+CREATE TABLE speech_button (id INTEGER PRIMARY KEY NOT NULL, label TEXT NOT NULL, speech_phrase TEXT NOT NULL, image BLOB);
+`);
+      currentDbVersion = 1;
+    }
+    await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+  }
+};
 
 const App = () => (
   <SafeAreaProvider>
-    <ScrollView>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.row}>
-          {action_names.map((name, index) => {
-            if (index % 12 == 0)
-              <View style={styles.row} key={index}>
-                <Actionbutton name={name} key={index} />
-              </View>;
+    <Suspense fallback={<Text>"Loading database..."</Text>}>
+      <SQLiteProvider
+        databaseName="test.db"
+        onInit={migrateDbIfNeeded}
+        useSuspense
+      >
+        <ScrollView>
+          <SafeAreaView style={styles.container}>
+            <View style={styles.row}>
+              {action_names.map((name, index) => {
+                if (index % 12 == 0)
+                  <View style={styles.row} key={index}>
+                    <Actionbutton name={name} key={index} />
+                  </View>;
 
-            return <Actionbutton name={name} key={index} />;
-          })}
-        </View>
-      </SafeAreaView>
-    </ScrollView>
+                return <Actionbutton name={name} key={index} />;
+              })}
+            </View>
+          </SafeAreaView>
+        </ScrollView>
+      </SQLiteProvider>
+    </Suspense>
 
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
