@@ -1,91 +1,63 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
-  Button,
   View,
-  Text,
-  Alert,
-  TouchableOpacity,
   ScrollView,
+  Text,
+  Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import Actionbutton from "../action_button";
-import Controlbutton from "../control_buttons";
-import { Dimensions } from "react-native";
-import {
-  SQLiteProvider,
-  useSQLiteContext,
-  type SQLiteDatabase,
-  openDatabaseAsync,
-} from "expo-sqlite";
-import { Suspense } from "react";
+import Actionbutton from "../action_button"; // Assuming you have this component imported
+import { useWindowDimensions } from "react-native";
 
-const Separator = () => <View style={styles.separator} />;
+const App = () => {
+  const { width, height } = useWindowDimensions(); // Dynamically get window size
 
-const action_names = ["NEW", "FOOD", "WATER", "WALK"];
+  const homeButtonLimit = 44;
 
-const migrateDbIfNeeded = async (db: SQLiteDatabase) => {
-  const DATABASE_VERSION = 1; //Increase by 1 after you add new migration
-  let user_version = await db.getFirstAsync<{
-    user_version: number;
-  }>("PRAGMA user_version");
-  console.log(user_version);
-  if (user_version != null) {
-    let currentDbVersion = user_version.user_version;
+  let action_names = new Array(homeButtonLimit).fill("");
+  action_names[0] = "WATER";
 
-    if (currentDbVersion >= DATABASE_VERSION) {
-      return;
-    }
-    if (currentDbVersion === 0) {
-      await db.execAsync(`
-PRAGMA journal_mode = 'wal';
-CREATE TABLE speech_button (id INTEGER PRIMARY KEY NOT NULL, label TEXT NOT NULL, speech_phrase TEXT NOT NULL, image BLOB);
-`);
-      currentDbVersion = 1;
-    }
-    await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
-  }
-};
+  action_names = action_names.slice(0, 44);
 
-const App = () => (
-  <SafeAreaProvider>
-    <Suspense fallback={<Text>"Loading database..."</Text>}>
-      <SQLiteProvider
-        databaseName="test.db"
-        onInit={migrateDbIfNeeded}
-        useSuspense
-      >
-        <ScrollView>
-          <SafeAreaView style={styles.container}>
-            <View style={styles.row}>
-              {action_names.map((name, index) => {
-                if (index % 12 == 0)
-                  <View style={styles.row} key={index}>
-                    <Actionbutton name={name} key={index} />
-                  </View>;
+  const [isEnabled, setIsEnabled] = useState(false);
 
-                return <Actionbutton name={name} key={index} />;
-              })}
-            </View>
-          </SafeAreaView>
-        </ScrollView>
-      </SQLiteProvider>
-    </Suspense>
+  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
-      <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
-    </View>
+  const numColumns = 12; // You seem to want 12 buttons per row
+  const buttonWidth = width / numColumns; // Dynamically set button width
 
-    {/*     <SafeAreaView style={styles.bottomContainer}>
-      <View style={styles.bottomrow}>
-        <Controlbutton name={"home.svg"} />
-        <Controlbutton name={"folder.svg"} />
-        <Controlbutton name={"settings.svg"} />
+  return (
+    <SafeAreaProvider>
+      <ScrollView>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.row}>
+            {action_names.map((action_name, index) => (
+              <View
+                key={index}
+                style={[
+                  action_name != ""
+                    ? styles.buttonContainer
+                    : styles.invisibleButtonContainer,
+                  { width: buttonWidth },
+                ]}
+              >
+                <Actionbutton name={action_name} />
+              </View>
+            ))}
+          </View>
+        </SafeAreaView>
+      </ScrollView>
+
+      <View>
+        <TouchableOpacity onPress={toggleSwitch}>
+          <text>EDIT/DEBUG {isEnabled ? "True" : "False"}</text>
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>*/}
-  </SafeAreaProvider>
-);
+    </SafeAreaProvider>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -97,22 +69,22 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     flexWrap: "wrap",
+
+    alignItems: "flex-start", // Ensures the buttons are spaced evenly
   },
 
-  separator: {
-    marginVertical: 9,
-    borderBottomColor: "#737373",
-    borderBottomWidth: StyleSheet.hairlineWidth,
+  buttonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 8, // Add vertical margin to increase space between rows
+    marginHorizontal: 2, // Horizontal spacing to avoid crowding
   },
 
-  bottomContainer: {
-    marginHorizontal: 16,
-    marginRight: 10,
-  },
-
-  bottomrow: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
+  invisibleButtonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 8, // Add vertical margin to increase space between rows
+    marginHorizontal: 2, // Horizontal spacing to avoid crowding
   },
 });
 

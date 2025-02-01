@@ -11,8 +11,8 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import Actionbutton from "./action_button";
-import Controlbutton from "./control_buttons";
+import Actionbutton from "../action_button";
+
 import { Dimensions } from "react-native";
 
 const windowWidth = Dimensions.get("window").width;
@@ -26,7 +26,7 @@ const App = () => (
       <View>
         <TouchableOpacity style={styles.camera} onPress={() => {}}>
           <Image
-            source={require("../assets/icons/camera.svg")}
+            source={require("../../assets/icons/camera.svg")}
             style={styles.image}
           />
         </TouchableOpacity>
@@ -39,19 +39,6 @@ const App = () => (
       <View style={styles.container}>
         <TextInput style={styles.label} placeholder="LABEL" />
         <TextInput style={styles.label} placeholder="AUDIO" />
-      </View>
-    </SafeAreaView>
-
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
-      <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
-    </View>
-
-    <SafeAreaView style={styles.bottomContainer}>
-      <View style={styles.bottomrow}>
-        <Controlbutton name={"home.svg"} />
-        <Controlbutton name={"folder.svg"} />
-        <Controlbutton name={"settings.svg"} />
       </View>
     </SafeAreaView>
   </SafeAreaProvider>
