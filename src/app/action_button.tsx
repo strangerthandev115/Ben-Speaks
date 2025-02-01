@@ -9,7 +9,6 @@ import {
   Image,
   TextInput,
 } from "react-native";
-import { scale } from "react-native-size-matters";
 
 import * as Speech from "expo-speech";
 
