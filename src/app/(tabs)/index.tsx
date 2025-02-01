@@ -9,8 +9,8 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import Actionbutton from "./action_button";
-import Controlbutton from "./control_buttons";
+import Actionbutton from "../action_button";
+import Controlbutton from "../control_buttons";
 import { Dimensions } from "react-native";
 
 const windowWidth = Dimensions.get("window").width;
@@ -30,11 +30,11 @@ const App = () => (
         <View style={styles.row}>
           {action_names.map((name, index) => {
             if (index % 12 == 0)
-              <View style={styles.row}>
-                <Actionbutton name={name} />
+              <View style={styles.row} key={index}>
+                <Actionbutton name={name} key={index} />
               </View>;
 
-            return <Actionbutton name={name} />;
+            return <Actionbutton name={name} key={index} />;
           })}
         </View>
       </SafeAreaView>
@@ -45,13 +45,13 @@ const App = () => (
       <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
     </View>
 
-    <SafeAreaView style={styles.bottomContainer}>
+    {/*     <SafeAreaView style={styles.bottomContainer}>
       <View style={styles.bottomrow}>
         <Controlbutton name={"home.svg"} />
         <Controlbutton name={"folder.svg"} />
         <Controlbutton name={"settings.svg"} />
       </View>
-    </SafeAreaView>
+    </SafeAreaView>*/}
   </SafeAreaProvider>
 );
 
