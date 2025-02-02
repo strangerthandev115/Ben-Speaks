@@ -1,4 +1,5 @@
 import React, { useState, Suspense, useEffect } from "react";
+import { useLocalSearchParams } from "expo-router";
 import {
   StyleSheet,
   View,
@@ -22,6 +23,7 @@ import { getAllSpeechButton } from "../services/database-service";
 import speechButton from "../models/speech-button";
 
 const App = () => {
+  const { editMode } = useLocalSearchParams();
   const { width, height } = useWindowDimensions(); // Dynamically get window size
 
   const homeButtonLimit = 36;
