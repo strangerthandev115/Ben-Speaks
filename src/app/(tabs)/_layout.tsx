@@ -10,10 +10,10 @@ export default function TabLayout() {
         tabBarPosition: "bottom",
         tabBarActiveTintColor: "#000000",
         tabBarInactiveTintColor: "#4c4a4a",
-        tabBarLabelPosition: "beside-icon",
+        tabBarLabelPosition: "below-icon",
         tabBarStyle: {
           height: 90, // Increases the height of the navigation bar
-          paddingBottom: 15, // Adds padding to center icons better
+          paddingBottom: 5, // Adds padding to center icons better
           paddingTop: 10, // Adjusts spacing
           alignItems: "center", // Centers the icons
         },
@@ -21,7 +21,7 @@ export default function TabLayout() {
           fontSize: 28, // Increases font size of labels
           fontWeight: "bold", // Makes labels bold
           textAlign: "center", // Centers the text
-          marginTop: 15,
+          marginTop: 5,
         },
       }}
     >
