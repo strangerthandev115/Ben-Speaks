@@ -18,27 +18,6 @@ import { addSpeechButton } from "../services/database-service";
 import { router } from "expo-router";
 import XmarkSVG from "@/assets/icons/xmark";
 
-<<<<<<< HEAD
-const App = () => (
-  <SafeAreaProvider>
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <SafeAreaView style={styles.cameraContainer}>
-          <View>
-            <TouchableOpacity style={styles.camera} onPress={() => {}}>
-              <CameraIcon />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-
-        <SafeAreaView style={styles.container}>
-          <View style={styles.formContainer}>
-            <TextInput style={styles.label} placeholder="LABEL" />
-            <TextInput style={styles.label} placeholder="AUDIO" />
-=======
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
@@ -86,7 +65,6 @@ const App = () => {
               <TextInput style={styles.label} placeholder="LABEL" />
               <TextInput style={styles.label} placeholder="AUDIO" />
             </View>
->>>>>>> 1c484a9490f9b407028917b26794901b426165c0
 
             {/* Save buttons container */}
             <View style={styles.buttonContainer}>
