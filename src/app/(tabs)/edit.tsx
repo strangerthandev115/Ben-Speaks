@@ -39,9 +39,7 @@ const App = () => (
       <View style={styles.container}>
         <TextInput style={styles.label} placeholder="LABEL" />
         <TextInput style={styles.label} placeholder="AUDIO" />
-        <button>
-          <text>SEND</text>
-        </button>
+        <Button onPress={() => {}} title="Send" />
       </View>
     </SafeAreaView>
   </SafeAreaProvider>
