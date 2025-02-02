@@ -69,6 +69,8 @@ const App = () => {
         return;
       }
       if (item !== undefined && item !== null) {
+        item.label = label;
+        item.speech_phrase = speechPhrase;
         updateSpeechButton(item);
       }
     } else {
