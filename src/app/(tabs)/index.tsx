@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -10,7 +10,7 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Actionbutton from "../action_button"; // Assuming you have this component imported
 import { useWindowDimensions } from "react-native";
-import  ImageTaker  from "../utilities/image_taker"
+import ImageTaker from "../utilities/image_taker";
 
 import {
   SQLiteProvider,
@@ -18,6 +18,8 @@ import {
   type SQLiteDatabase,
   openDatabaseAsync,
 } from "expo-sqlite";
+import { getAllSpeechButton } from "../services/database-service";
+import speechButton from "../models/speech-button";
 
 const App = () => {
   const { width, height } = useWindowDimensions(); // Dynamically get window size
@@ -30,6 +32,7 @@ const App = () => {
   action_names = action_names.slice(0, 36);
 
   const [isEnabled, setIsEnabled] = useState(false);
+  const [speechButtons, setSpeechButtons] = useState<Array<speechButton>>([]);
 
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
@@ -59,6 +62,16 @@ const App = () => {
     }
   };
 
+  useEffect(() => {
+    const populateSpeechButtons = async () => {
+      const speechButtons = await getAllSpeechButton();
+
+      return speechButtons;
+    };
+
+    populateSpeechButtons().then((data) => setSpeechButtons(data));
+  }, []);
+
   return (
     <SafeAreaProvider>
       <Suspense fallback={<Text>"Loading database..."</Text>}>
@@ -70,17 +83,22 @@ const App = () => {
           <ScrollView>
             <SafeAreaView style={styles.container}>
               <View style={styles.row}>
-                {action_names.map((action_name, index) => (
+                {speechButtons.map((speechButton, index) => (
                   <View
                     key={index}
                     style={[
-                      action_name != ""
+                      speechButton.label != ""
                         ? styles.buttonContainer
                         : styles.invisibleButtonContainer,
                       { width: buttonWidth },
                     ]}
                   >
-                    <Actionbutton name={action_name} />
+                    <Actionbutton
+                      name={speechButton.label}
+                      speech_phrase={speechButton.speech_phrase}
+                      image={speechButton.image}
+                      key={speechButton.id}
+                    />
                   </View>
                 ))}
               </View>
@@ -93,7 +111,7 @@ const App = () => {
         <TouchableOpacity onPress={toggleSwitch}>
           <Text>EDIT/DEBUG {isEnabled ? "True" : "False"}</Text>
         </TouchableOpacity>
-        <ImageTaker/>
+        <ImageTaker />
       </View>
     </SafeAreaProvider>
   );

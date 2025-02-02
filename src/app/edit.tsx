@@ -9,17 +9,15 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  Dimensions,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import CameraIcon from "@/assets/icons/camera";
 import CheckmarkSVG from "@/assets/icons/checkmark";
-import speechButton from "../models/speech-button";
-import { addSpeechButton } from "../services/database-service";
+import speechButton from "./models/speech-button";
+import { addSpeechButton } from "./services/database-service";
 import { router } from "expo-router";
 import XmarkSVG from "@/assets/icons/xmark";
-
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
 
 const App = () => {
   const [label, setLabel] = useState<string>("");
@@ -62,20 +60,6 @@ const App = () => {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <SafeAreaView>
             <View style={styles.container}>
-              <TextInput style={styles.label} placeholder="LABEL" />
-              <TextInput style={styles.label} placeholder="AUDIO" />
-            </View>
-
-            {/* Save buttons container */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={() => {}} style={styles.saveButton}>
-                <XmarkSVG />
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
-
-          <SafeAreaView>
-            <View style={styles.container}>
               <TextInput
                 style={styles.label}
                 placeholder="LABEL"
@@ -98,10 +82,7 @@ const App = () => {
                   }}
                   style={styles.saveButton}
                 >
-                  <Image
-                    source={require("../../assets/icons/xmark-square.svg")} // Change to PNG or SVG handling
-                    style={styles.image}
-                  />
+                  <XmarkSVG />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => onSavePressed()}
