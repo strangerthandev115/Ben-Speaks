@@ -24,8 +24,8 @@ import {
 } from "./services/database-service";
 import { router, useLocalSearchParams } from "expo-router";
 import XmarkSVG from "@/assets/icons/xmark";
-import ImageGetter from "./utilities/image_taker";
-import ImageTaker from "./utilities/image_picker";
+import ImageGetter from "./utilities/image_picker";
+import ImageTaker from "./utilities/image_taker";
 
 const App = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -88,6 +88,7 @@ const App = () => {
     setLabel("");
     setSpeechPhrase("");
     setItem(undefined);
+    setBase64Image(null);
   };
 
   useEffect(() => {
@@ -104,6 +105,7 @@ const App = () => {
         setItem(data);
         setLabel(data.label);
         setSpeechPhrase(data.speech_phrase);
+        setBase64Image(data.image)
       }
     });
   }, []);
@@ -124,19 +126,24 @@ const App = () => {
               <Text style={styles.modalTitle}>
                 Would you like to select an image from library or take one?
               </Text>
-              <Button
-                title="Select an image from library"
+              <TouchableOpacity
+                style={styles.modalButtons}
                 onPress={() => {
                   handleImagePicker();
-                }}
-              />
-              <Button
-                title="Take photo with camera"
+                }}>
+                <Text style={styles.modalText}>Select a Photo</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButtons}
                 onPress={() => {
                   handleImageTaker();
                 }}
-              />
-              <Button title="Close" onPress={() => setModalVisible(false)} />
+              >
+                <Text style={styles.modalText}>Take a Photo</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButtons} onPress={() => setModalVisible(false)}>
+                <Text style={styles.modalText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
@@ -246,6 +253,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 40, // Push camera button further down
+    borderRadius: 20,
   },
 
   cameraContainer: {
@@ -265,10 +273,11 @@ const styles = StyleSheet.create({
 
   saveButton: {
     padding: 5,
+    margin: 5,
     backgroundColor: "#4CAF50", // Example style
-    borderRadius: 1,
+    borderRadius: 10,
     height: 75,
-    width: 75,
+    width: 150,
     justifyContent: "center",
     alignItems: "center", // Center the icon within the button
   },
@@ -279,7 +288,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContainer: {
-    width: "80%",
+    width: "60%",
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
@@ -290,14 +299,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  modalButtons: {
+    fontSize: 20,
+    backgroundColor: '#007AFF',
+    width: "20%",
+    height: 30,
+    borderRadius: 5,
+    alignItems: 'center', 
+    marginBottom: 10,
+  },
   modalText: {
-    fontSize: 16,
-    marginBottom: 20,
+    color: 'white',
   },
   image: {
     height: 250,
     width: 250,
-    top: 25,
     alignSelf: "center",
   },
 });
