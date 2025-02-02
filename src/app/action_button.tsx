@@ -14,8 +14,12 @@ import { router } from "expo-router";
 import TrashSvg from "@/assets/icons/trashSvg";
 import { deleteSpeechButton } from "./services/database-service";
 
-type Props = { item: speechButton; editMode?: boolean };
-const Actionbutton = ({ item, editMode = false }: Props) => {
+type Props = {
+  item: speechButton;
+  editMode?: boolean;
+  onItemDeleted(id: number): void;
+};
+const Actionbutton = ({ item, onItemDeleted, editMode = false }: Props) => {
   let base64String: string = "";
   let dataUri: string = "";
   const speak = () => {
@@ -44,6 +48,7 @@ const Actionbutton = ({ item, editMode = false }: Props) => {
           text: "Yes",
           onPress: () => {
             deleteSpeechButton(item.id);
+            onItemDeleted(item.id);
           },
         },
       ]
