@@ -2,13 +2,13 @@ class speechButton {
   id: number;
   label: string;
   speech_phrase: string;
-  image: Uint8Array | null = null;
+  image: string | null = null;
 
   constructor(
     id: number,
     label: string,
     speech_phrase: string,
-    image: Uint8Array | null = null
+    image: string | null = null
   ) {
     this.id = id;
     this.label = label;

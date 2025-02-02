@@ -5,6 +5,8 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  Image,
+  Modal,
   View,
   KeyboardAvoidingView,
   ScrollView,
@@ -20,10 +22,25 @@ import XmarkSVG from "@/assets/icons/xmark";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
+const Separator = () => <View style={styles.separator} />;
 
 const App = () => {
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [base64Image, setBase64Image] = useState<string|null>(null);
   const [label, setLabel] = useState<string>("");
   const [speechPhrase, setSpeechPhrase] = useState<string>("");
+  const handleImagePicker = async () => {
+    const image = await ImageGetter(); 
+    setBase64Image(image);
+    setModalVisible(false);
+  }
+  const handleImageTaker = async () => {
+    const image = await ImageTaker();
+    setBase64Image(image);
+    setModalVisible(false)
+  }
+
 
   const onSavePressed = () => {
     if (label == "" || speechPhrase == "") {
@@ -50,11 +67,27 @@ const App = () => {
       <SafeAreaView style={styles.cameraContainer}>
         <View>
           <TouchableOpacity style={styles.camera} onPress={() => {}}>
+            {!base64Image && <CameraIcon/>}
+            {base64Image && <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${base64Image}`}}/>}
             <CameraIcon />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
 
+      <View>
+        <Modal animationType="slide" visible={modalVisible} transparent={true} onRequestClose={() => {
+            setModalVisible(false);
+          }}>
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Would you like to select an image from library or take one?</Text>
+              <Button title="Select an image from library" onPress={() => {handleImagePicker()}}/>
+              <Button title="Take photo with camera" onPress={() => {handleImageTaker()}}/>
+              <Button title="Close" onPress={() => setModalVisible(false)} />
+            </View>
+        </View>
+        </Modal>
+      </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -181,6 +214,28 @@ const styles = StyleSheet.create({
     width: 75,
     justifyContent: "center",
     alignItems: "center", // Center the icon within the button
+  },
+    modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
   },
 });
 
