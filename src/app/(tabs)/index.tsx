@@ -1,4 +1,5 @@
 import React, { useState, Suspense } from "react";
+import { useLocalSearchParams } from "expo-router";
 import {
   StyleSheet,
   View,
@@ -10,7 +11,7 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Actionbutton from "../action_button"; // Assuming you have this component imported
 import { useWindowDimensions } from "react-native";
-import  ImageTaker  from "../utilities/image_taker"
+import ImageTaker from "../utilities/image_taker";
 
 import {
   SQLiteProvider,
@@ -20,6 +21,7 @@ import {
 } from "expo-sqlite";
 
 const App = () => {
+  const { editMode } = useLocalSearchParams();
   const { width, height } = useWindowDimensions(); // Dynamically get window size
 
   const homeButtonLimit = 36;
@@ -93,7 +95,7 @@ const App = () => {
         <TouchableOpacity onPress={toggleSwitch}>
           <Text>EDIT/DEBUG {isEnabled ? "True" : "False"}</Text>
         </TouchableOpacity>
-        <ImageTaker/>
+        <ImageTaker />
       </View>
     </SafeAreaProvider>
   );
