@@ -21,9 +21,10 @@ import {
 } from "expo-sqlite";
 import { getAllSpeechButton } from "../services/database-service";
 import speechButton from "../models/speech-button";
+import AddNewButton from "../add_new_button";
 
 const App = () => {
-  const { editMode } = useLocalSearchParams();
+  const { editMode } = useLocalSearchParams<{ editMode: string }>();
   const { width, height } = useWindowDimensions(); // Dynamically get window size
 
   const homeButtonLimit = 36;
@@ -33,10 +34,7 @@ const App = () => {
 
   action_names = action_names.slice(0, 36);
 
-  const [isEnabled, setIsEnabled] = useState(false);
   const [speechButtons, setSpeechButtons] = useState<Array<speechButton>>([]);
-
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
   const numColumns = 10; // You seem to want 12 buttons per row
   const buttonWidth = width / numColumns; // Dynamically set button width
@@ -74,6 +72,10 @@ const App = () => {
     populateSpeechButtons().then((data) => setSpeechButtons(data));
   }, []);
 
+  const isEditMode = () => {
+    return editMode?.toLowerCase() == "true";
+  };
+
   return (
     <SafeAreaProvider>
       <Suspense fallback={<Text>"Loading database..."</Text>}>
@@ -96,13 +98,19 @@ const App = () => {
                     ]}
                   >
                     <Actionbutton
-                      name={speechButton.label}
-                      speech_phrase={speechButton.speech_phrase}
-                      image={speechButton.image}
+                      item={speechButton}
                       key={speechButton.id}
+                      editMode={isEditMode()}
                     />
                   </View>
                 ))}
+                {isEditMode() ? (
+                  <View style={styles.row}>
+                    <AddNewButton />
+                  </View>
+                ) : (
+                  <></>
+                )}
               </View>
             </SafeAreaView>
           </ScrollView>
@@ -110,9 +118,6 @@ const App = () => {
       </Suspense>
 
       <View>
-        <TouchableOpacity onPress={toggleSwitch}>
-          <Text>EDIT/DEBUG {isEnabled ? "True" : "False"}</Text>
-        </TouchableOpacity>
         <ImageTaker />
       </View>
     </SafeAreaProvider>

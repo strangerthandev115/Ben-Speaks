@@ -68,10 +68,16 @@ export const updateSpeechButton = async (item: speechButton) => {
 
 export const deleteSpeechButton = async (id: number) => {
   const db = await getDbConnection();
+  console.log("Made it here");
 
-  const statement = await db.prepareAsync("DELETE speech_button WHERE Id = ?");
+  const statement = await db.prepareAsync(
+    "DELETE FROM speech_button WHERE Id = ?"
+  );
   try {
     const result = await statement.executeAsync(id);
+    console.log(result);
+  } catch (error) {
+    console.log(error);
   } finally {
     await statement.finalizeAsync();
   }
@@ -80,7 +86,7 @@ export const deleteSpeechButton = async (id: number) => {
 export const deleteAllSpeechButtons = async () => {
   const db = await getDbConnection();
 
-  const statement = await db.prepareAsync("DELETE speech_button");
+  const statement = await db.prepareAsync("DELETE FROM speech_button");
   try {
     const result = await statement.executeAsync();
   } finally {
