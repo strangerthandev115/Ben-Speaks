@@ -1,120 +1,6 @@
-// import React from "react";
-// import {
-//   StyleSheet,
-//   Button,
-//   View,
-//   Text,
-//   Alert,
-//   TouchableOpacity,
-//   ScrollView,
-//   TextInput,
-//   Image,
-// } from "react-native";
-// import SvgUri from 'react-native-svg-uri'; // or use other methods based on your version of react-native-svg
-
-// import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-// import Actionbutton from "../action_button";
-
-// import { Dimensions } from "react-native";
-
-// const windowWidth = Dimensions.get("window").width;
-// const windowHeight = Dimensions.get("window").height;
-
-// const App = () => (
-//   <SafeAreaProvider>
-//     <SafeAreaView style={styles.cameraContainer}>
-//       <View>
-//         <TouchableOpacity style={styles.camera} onPress={() => {}}>
-//           <Image
-//             source={require("../../assets/icons/camera.svg")}
-//             style={styles.image}
-//           />
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-
-//     <View></View>
-
-//     <SafeAreaView>
-//       <View style={styles.container}>
-//         <TextInput style={styles.label} placeholder="LABEL" />
-//         <TextInput style={styles.label} placeholder="AUDIO" />
-//         <TouchableOpacity onPress={() => {}}>
-//           <Text>SAVE</Text>
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   </SafeAreaProvider>
-// );
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: "flex-end", // Align items to the bottom
-//     alignItems: "center",
-//     bottom: 100,
-//   },
-
-//   row: {
-//     flexDirection: "row",
-//     flexWrap: "wrap",
-//   },
-
-//   bottomContainer: {
-//     marginHorizontal: 16,
-//     marginRight: 10,
-//   },
-
-//   bottomrow: {
-//     flexDirection: "row",
-//     justifyContent: "space-evenly",
-//   },
-
-//   label: {
-//     top: 0,
-//     height: 40,
-//     width: 400,
-//     margin: 10,
-//     borderWidth: 1,
-//     padding: 10,
-//   },
-
-//   camera: {
-//     backgroundColor: "#99f18a",
-//     top: 100,
-//     width: 300,
-//     borderWidth: 5,
-//     height: 300,
-//   },
-
-//   cameraContainer: {
-//     flex: 1,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     marginBottom: 400,
-//   },
-
-//   image: {
-//     height: 250,
-//     width: 250,
-//     top: 25,
-//     alignSelf: "center",
-//     justifyContent: "center",
-//   },
-
-//   send: {
-//     height: 500,
-//     width: 400,
-//     margin: 10,
-//     borderWidth: 1,
-//     padding: 10,
-//     bottom: 10,
-//   },
-// });
-
-// export default App;
-import React from "react";
+import React, { useState } from "react";
 import {
+  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -128,52 +14,99 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Dimensions } from "react-native";
 import CheckmarkSVG from "@/assets/icons/checkmark";
+import speechButton from "../models/speech-button";
+import { addSpeechButton } from "../services/database-service";
+import { router } from "expo-router";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
-const App = () => (
-  <SafeAreaProvider>
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <SafeAreaView style={styles.cameraContainer}>
-          <View>
-            <TouchableOpacity style={styles.camera} onPress={() => {}}>
-              {/* You may want to change this to a PNG or use react-native-svg for SVG */}
-              <Image
-                source={require("../../assets/icons/camera.svg")} // Change to PNG or SVG handling
-                style={styles.image}
-              />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
+const App = () => {
+  const [label, setLabel] = useState<string>("");
+  const [speechPhrase, setSpeechPhrase] = useState<string>("");
 
-        <SafeAreaView>
-          <View style={styles.container}>
-            <TextInput style={styles.label} placeholder="LABEL" />
-            <TextInput style={styles.label} placeholder="AUDIO" />
+  const onSavePressed = () => {
+    if (label == "" || speechPhrase == "") {
+      Alert.alert(
+        "Validation Failed",
+        "A label and spreech phrase (audio) should both be included",
+        [{ text: "OK", onPress: () => {} }]
+      );
+      return;
+    }
 
-            {/* Save buttons container */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={() => {}} style={styles.saveButton}>
+    const newItem = new speechButton(1, label, speechPhrase, null);
+
+    addSpeechButton(newItem);
+    resetInputs();
+    router.push("/");
+  };
+  const resetInputs = () => {
+    setLabel("");
+    setSpeechPhrase("");
+  };
+  return (
+    <SafeAreaProvider>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <SafeAreaView style={styles.cameraContainer}>
+            <View>
+              <TouchableOpacity style={styles.camera} onPress={() => {}}>
+                {/* You may want to change this to a PNG or use react-native-svg for SVG */}
                 <Image
-                  source={require("../../assets/icons/xmark-square.svg")} // Change to PNG or SVG handling
+                  source={require("../../assets/icons/camera.svg")} // Change to PNG or SVG handling
                   style={styles.image}
                 />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => {}} style={styles.saveButton}>
-                <CheckmarkSVG />
-              </TouchableOpacity>
             </View>
-          </View>
-        </SafeAreaView>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  </SafeAreaProvider>
-);
+          </SafeAreaView>
+
+          <SafeAreaView>
+            <View style={styles.container}>
+              <TextInput
+                style={styles.label}
+                placeholder="LABEL"
+                value={label}
+                onChangeText={(text) => setLabel(text)}
+              />
+              <TextInput
+                style={styles.label}
+                placeholder="AUDIO"
+                value={speechPhrase}
+                onChangeText={(text) => setSpeechPhrase(text)}
+              />
+
+              {/* Save buttons container */}
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    resetInputs();
+                    router.push("/");
+                  }}
+                  style={styles.saveButton}
+                >
+                  <Image
+                    source={require("../../assets/icons/xmark-square.svg")} // Change to PNG or SVG handling
+                    style={styles.image}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => onSavePressed()}
+                  style={styles.saveButton}
+                >
+                  <CheckmarkSVG />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </SafeAreaView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaProvider>
+  );
+};
 
 const styles = StyleSheet.create({
   scrollContainer: {
