@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  Button
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import CameraIcon from "@/assets/icons/camera";
@@ -19,10 +20,9 @@ import speechButton from "../models/speech-button";
 import { addSpeechButton } from "../services/database-service";
 import { router } from "expo-router";
 import XmarkSVG from "@/assets/icons/xmark";
+import ImageGetter from "../utilities/image_taker"
+import ImageTaker from "../utilities/image_picker"
 
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
-const Separator = () => <View style={styles.separator} />;
 
 const App = () => {
 
@@ -66,10 +66,9 @@ const App = () => {
     <SafeAreaProvider>
       <SafeAreaView style={styles.cameraContainer}>
         <View>
-          <TouchableOpacity style={styles.camera} onPress={() => {}}>
+          <TouchableOpacity style={styles.camera} onPress={() => {setModalVisible(true)}}>
             {!base64Image && <CameraIcon/>}
             {base64Image && <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${base64Image}`}}/>}
-            <CameraIcon />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -236,6 +235,12 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
     marginBottom: 20,
+  },
+    image: {
+    height: 250,
+    width: 250,
+    top: 25,
+    alignSelf: "center",
   },
 });
 
