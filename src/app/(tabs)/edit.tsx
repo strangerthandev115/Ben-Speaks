@@ -39,6 +39,9 @@ const App = () => (
       <View style={styles.container}>
         <TextInput style={styles.label} placeholder="LABEL" />
         <TextInput style={styles.label} placeholder="AUDIO" />
+        <button>
+          <text>SEND</text>
+        </button>
       </View>
     </SafeAreaView>
   </SafeAreaProvider>
@@ -102,6 +105,14 @@ const styles = StyleSheet.create({
     top: 25,
     alignSelf: "center",
     justifyContent: "center",
+  },
+
+  send: {
+    height: 40,
+    width: 400,
+    margin: 10,
+    borderWidth: 1,
+    padding: 10,
   },
 });
 
