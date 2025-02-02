@@ -76,7 +76,7 @@ const App = () => {
         raiseValidationAlert();
         return;
       }
-      const newItem = new speechButton(1, label, speechPhrase, null);
+      const newItem = new speechButton(1, label, speechPhrase, base64Image);
 
       addSpeechButton(newItem);
     }
