@@ -20,18 +20,18 @@ import {
 const App = () => {
   const { width, height } = useWindowDimensions(); // Dynamically get window size
 
-  const homeButtonLimit = 44;
+  const homeButtonLimit = 36;
 
   let action_names = new Array(homeButtonLimit).fill("");
   action_names[0] = "WATER";
 
-  action_names = action_names.slice(0, 44);
+  action_names = action_names.slice(0, 36);
 
   const [isEnabled, setIsEnabled] = useState(false);
 
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
-  const numColumns = 12; // You seem to want 12 buttons per row
+  const numColumns = 10; // You seem to want 12 buttons per row
   const buttonWidth = width / numColumns; // Dynamically set button width
 
   const migrateDbIfNeeded = async (db: SQLiteDatabase) => {
