@@ -29,7 +29,6 @@ const AddNewButton = () => {
 
 const styles = StyleSheet.create({
   button: {
-    marginVertical: 10,
     marginHorizontal: 10,
     bottom: 55,
     left: 0,
