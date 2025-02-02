@@ -23,10 +23,7 @@ const Actionbutton = ({ item, editMode = false }: Props) => {
   };
 
   if (item.image !== null) {
-    base64String = btoa(
-      String.fromCharCode.apply(null, Array.from(item.image))
-    );
-    dataUri = `data:image/png;base64,${base64String}`;
+    dataUri = `data:image/jpeg;base64,${item.image}`;
   }
 
   const navigateToEdit = () => {
@@ -46,7 +43,6 @@ const Actionbutton = ({ item, editMode = false }: Props) => {
         {
           text: "Yes",
           onPress: () => {
-            console.log("Yes pressed");
             deleteSpeechButton(item.id);
           },
         },
@@ -60,7 +56,14 @@ const Actionbutton = ({ item, editMode = false }: Props) => {
         style={styles.touchable}
         onPress={() => (!editMode ? speak() : navigateToEdit())}
       >
-        {dataUri !== "" ? <Image source={{ uri: dataUri }} /> : <></>}
+        {dataUri !== "" ? (
+          <Image
+            source={{ uri: dataUri }}
+            style={{ width: 125, height: 125, alignSelf: "center" }}
+          />
+        ) : (
+          <></>
+        )}
       </TouchableOpacity>
       <View>
         <Text style={styles.text}>{item.label}</Text>

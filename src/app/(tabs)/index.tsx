@@ -39,7 +39,7 @@ const App = () => {
   const buttonWidth = width / numColumns; // Dynamically set button width
 
   const migrateDbIfNeeded = async (db: SQLiteDatabase) => {
-    const DATABASE_VERSION = 1; //Increase by 1 after you add new migration
+    const DATABASE_VERSION = 3; //Increase by 1 after you add new migration
     let user_version = await db.getFirstAsync<{
       user_version: number;
     }>("PRAGMA user_version");
@@ -57,6 +57,18 @@ const App = () => {
   `);
         currentDbVersion = 1;
       }
+      if (currentDbVersion >= DATABASE_VERSION) {
+        await db.execAsync(`
+          DROP TABLE speech_button;
+          `);
+        currentDbVersion = 2;
+      }
+      if (currentDbVersion >= DATABASE_VERSION) {
+        await db.execAsync(`
+            CREATE TABLE speech_button (id INTEGER PRIMARY KEY NOT NULL, label TEXT NOT NULL, speech_phrase TEXT NOT NULL, image string);
+            `);
+        currentDbVersion = 3;
+      }
       await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
     }
   };
@@ -68,7 +80,9 @@ const App = () => {
       return speechButtons;
     };
 
-    populateSpeechButtons().then((data) => setSpeechButtons(data));
+    populateSpeechButtons().then((data) => {
+      setSpeechButtons(data);
+    });
   }, []);
 
   const isEditMode = () => {
