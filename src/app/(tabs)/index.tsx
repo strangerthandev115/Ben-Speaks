@@ -55,7 +55,6 @@ const App = () => {
         <TouchableOpacity onPress={toggleSwitch}>
           <Text>EDIT/DEBUG {isEnabled ? "True" : "False"}</Text>
         </TouchableOpacity>
-        <ImageTaker/>
       </View>
     </SafeAreaProvider>
   );
