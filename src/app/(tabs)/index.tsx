@@ -34,6 +34,8 @@ const App = () => {
   action_names = action_names.slice(0, 36);
 
   const [speechButtons, setSpeechButtons] = useState<Array<speechButton>>([]);
+  const [justHereForReRender, setJustHereForReRender] =
+    useState<boolean>(false);
 
   const numColumns = 10; // You seem to want 12 buttons per row
   const buttonWidth = width / numColumns; // Dynamically set button width
@@ -83,7 +85,7 @@ const App = () => {
     populateSpeechButtons().then((data) => {
       setSpeechButtons(data);
     });
-  }, []);
+  }, [justHereForReRender]);
 
   const isEditMode = () => {
     return editMode?.toLowerCase() == "true";
@@ -121,6 +123,7 @@ const App = () => {
                       item={speechButton}
                       key={speechButton.id}
                       editMode={isEditMode()}
+                      onItemDeleted={(id) => setJustHereForReRender(true)}
                     />
                   </View>
                 ))}
