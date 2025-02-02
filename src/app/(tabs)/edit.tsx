@@ -12,8 +12,10 @@ import {
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Actionbutton from "../action_button";
-
 import { Dimensions } from "react-native";
+import ImageTaker from "../utilities/image_taker"
+import ImageGetter from "../utilities/image_picker"
+import CameraIcon from "@/assets/icons/camera";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -25,11 +27,9 @@ const App = () => (
     <SafeAreaView style={styles.cameraContainer}>
       <View>
         <TouchableOpacity style={styles.camera} onPress={() => {}}>
-          <Image
-            source={require("../../assets/icons/camera.svg")}
-            style={styles.image}
-          />
+        <CameraIcon/>
         </TouchableOpacity>
+
       </View>
     </SafeAreaView>
 

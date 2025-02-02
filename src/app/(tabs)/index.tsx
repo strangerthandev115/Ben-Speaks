@@ -10,6 +10,7 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Actionbutton from "../action_button"; // Assuming you have this component imported
 import { useWindowDimensions } from "react-native";
+import  ImageTaker  from "../utilities/image_taker"
 
 const App = () => {
   const { width, height } = useWindowDimensions(); // Dynamically get window size
@@ -52,8 +53,9 @@ const App = () => {
 
       <View>
         <TouchableOpacity onPress={toggleSwitch}>
-          <text>EDIT/DEBUG {isEnabled ? "True" : "False"}</text>
+          <Text>EDIT/DEBUG {isEnabled ? "True" : "False"}</Text>
         </TouchableOpacity>
+        <ImageTaker/>
       </View>
     </SafeAreaProvider>
   );
