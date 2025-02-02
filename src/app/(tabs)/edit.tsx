@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -17,46 +18,110 @@ import ImageTaker from "../utilities/image_taker";
 import ImageGetter from "../utilities/image_picker";
 import CameraIcon from "@/assets/icons/camera";
 import CheckmarkSVG from "@/assets/icons/checkmark";
+import speechButton from "../models/speech-button";
+import { addSpeechButton } from "../services/database-service";
+import { router } from "expo-router";
 import XmarkSVG from "@/assets/icons/xmark";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
-const App = () => (
-  <SafeAreaProvider>
-    <SafeAreaView style={styles.cameraContainer}>
-      <View>
-        <TouchableOpacity style={styles.camera} onPress={() => {}}>
-          <CameraIcon />
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+const App = () => {
+  const [label, setLabel] = useState<string>("");
+  const [speechPhrase, setSpeechPhrase] = useState<string>("");
 
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <SafeAreaView>
-          <View style={styles.container}>
-            <TextInput style={styles.label} placeholder="LABEL" />
-            <TextInput style={styles.label} placeholder="AUDIO" />
+  const onSavePressed = () => {
+    if (label == "" || speechPhrase == "") {
+      Alert.alert(
+        "Validation Failed",
+        "A label and spreech phrase (audio) should both be included",
+        [{ text: "OK", onPress: () => {} }]
+      );
+      return;
+    }
+
+    const newItem = new speechButton(1, label, speechPhrase, null);
+
+    addSpeechButton(newItem);
+    resetInputs();
+    router.push("/");
+  };
+  const resetInputs = () => {
+    setLabel("");
+    setSpeechPhrase("");
+  };
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.cameraContainer}>
+        <View>
+          <TouchableOpacity style={styles.camera} onPress={() => {}}>
+            <CameraIcon />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <SafeAreaView>
+            <View style={styles.container}>
+              <TextInput style={styles.label} placeholder="LABEL" />
+              <TextInput style={styles.label} placeholder="AUDIO" />
+            </View>
 
             {/* Save buttons container */}
             <View style={styles.buttonContainer}>
               <TouchableOpacity onPress={() => {}} style={styles.saveButton}>
                 <XmarkSVG />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => {}} style={styles.saveButton}>
-                <CheckmarkSVG />
-              </TouchableOpacity>
             </View>
-          </View>
-        </SafeAreaView>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  </SafeAreaProvider>
-);
+          </SafeAreaView>
+
+          <SafeAreaView>
+            <View style={styles.container}>
+              <TextInput
+                style={styles.label}
+                placeholder="LABEL"
+                value={label}
+                onChangeText={(text) => setLabel(text)}
+              />
+              <TextInput
+                style={styles.label}
+                placeholder="AUDIO"
+                value={speechPhrase}
+                onChangeText={(text) => setSpeechPhrase(text)}
+              />
+
+              {/* Save buttons container */}
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    resetInputs();
+                    router.push("/");
+                  }}
+                  style={styles.saveButton}
+                >
+                  <Image
+                    source={require("../../assets/icons/xmark-square.svg")} // Change to PNG or SVG handling
+                    style={styles.image}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => onSavePressed()}
+                  style={styles.saveButton}
+                >
+                  <CheckmarkSVG />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </SafeAreaView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaProvider>
+  );
+};
 
 const styles = StyleSheet.create({
   scrollContainer: {
