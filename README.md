@@ -1,4 +1,4 @@
-![Banner Image for Ben Speaks](src/assets/images/"banner".png)
+![Banner Image for Ben Speaks](src/assets/images/banner.png)
 
 An accessible Augmentative and Alternative Communication (AAC) app built with Expo + React Native + SQLite. This app allows users to take photos, name them, and use them as speech buttons for communication. Ben Speaks serves as a FOSS alternative to the popular AAC apps that often cost a lot of money that special needs families may not be able to afford.
 
