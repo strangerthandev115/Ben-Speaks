@@ -34,9 +34,9 @@ const styles = StyleSheet.create({
     alignItems: "center", // Centers content within the button
   },
   text: {
-    textAlign: "center",
+    textAlign: "auto",
     textDecorationStyle: "double",
-    fontSize: 16, // Adjusted font size for visibility
+    fontSize: 15, // Adjusted font size for visibility
   },
   image: {
     height: "70%", // Adjust height to fit inside the button (scaling)
