@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   StyleSheet,
-  Text,
   TouchableOpacity,
   TextInput,
   Image,
@@ -11,103 +10,165 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
-  Button
+  Text,
+  Button,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import CameraIcon from "@/assets/icons/camera";
 import CheckmarkSVG from "@/assets/icons/checkmark";
-import speechButton from "../models/speech-button";
-import { addSpeechButton } from "../services/database-service";
-import { router } from "expo-router";
+import speechButton from "./models/speech-button";
+import {
+  addSpeechButton,
+  getSpeechButtonById,
+  updateSpeechButton,
+} from "./services/database-service";
+import { router, useLocalSearchParams } from "expo-router";
 import XmarkSVG from "@/assets/icons/xmark";
-import ImageGetter from "../utilities/image_taker"
-import ImageTaker from "../utilities/image_picker"
-
+import ImageGetter from "./utilities/image_taker";
+import ImageTaker from "./utilities/image_picker";
 
 const App = () => {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const [item, setItem] = useState<speechButton | undefined | null>(undefined);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [base64Image, setBase64Image] = useState<string|null>(null);
+  const [base64Image, setBase64Image] = useState<string | null>(null);
   const [label, setLabel] = useState<string>("");
   const [speechPhrase, setSpeechPhrase] = useState<string>("");
   const handleImagePicker = async () => {
-    const image = await ImageGetter(); 
+    const image = await ImageGetter();
     setBase64Image(image);
     setModalVisible(false);
-  }
+  };
   const handleImageTaker = async () => {
     const image = await ImageTaker();
     setBase64Image(image);
-    setModalVisible(false)
-  }
+    setModalVisible(false);
+  };
 
+  const isInvalidRequest = () => {
+    return label == "" || speechPhrase == "";
+  };
+
+  const raiseValidationAlert = () => {
+    Alert.alert(
+      "Validation Failed",
+      "A label and spreech phrase (audio) should both be included",
+      [{ text: "OK", onPress: () => {} }]
+    );
+  };
+
+  const isRequestAnUpdate = () => {
+    return id !== undefined && id !== null;
+  };
 
   const onSavePressed = () => {
-    if (label == "" || speechPhrase == "") {
-      Alert.alert(
-        "Validation Failed",
-        "A label and spreech phrase (audio) should both be included",
-        [{ text: "OK", onPress: () => {} }]
-      );
-      return;
+    if (isRequestAnUpdate()) {
+      if (isInvalidRequest()) {
+        raiseValidationAlert();
+        return;
+      }
+      if (item !== undefined && item !== null) {
+        updateSpeechButton(item);
+      }
+    } else {
+      if (isInvalidRequest()) {
+        raiseValidationAlert();
+        return;
+      }
+      const newItem = new speechButton(1, label, speechPhrase, null);
+
+      addSpeechButton(newItem);
     }
-
-    const newItem = new speechButton(1, label, speechPhrase, null);
-
-    addSpeechButton(newItem);
     resetInputs();
     router.push("/");
   };
+
   const resetInputs = () => {
     setLabel("");
     setSpeechPhrase("");
+    setItem(undefined);
   };
+
+  useEffect(() => {
+    if (isRequestAnUpdate()) {
+    }
+    const populateSpeechButtonData = async () => {
+      const speechButton = await getSpeechButtonById(Number(id));
+
+      return speechButton;
+    };
+
+    populateSpeechButtonData().then((data) => {
+      if (data !== undefined && data !== null) {
+        setItem(data);
+        setLabel(data.label);
+        setSpeechPhrase(data.speech_phrase);
+      }
+    });
+  }, []);
+
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.cameraContainer}>
-        <View>
-          <TouchableOpacity style={styles.camera} onPress={() => {setModalVisible(true)}}>
-            {!base64Image && <CameraIcon/>}
-            {base64Image && <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${base64Image}`}}/>}
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-
       <View>
-        <Modal animationType="slide" visible={modalVisible} transparent={true} onRequestClose={() => {
+        <Modal
+          animationType="slide"
+          visible={modalVisible}
+          transparent={true}
+          onRequestClose={() => {
             setModalVisible(false);
-          }}>
+          }}
+        >
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Would you like to select an image from library or take one?</Text>
-              <Button title="Select an image from library" onPress={() => {handleImagePicker()}}/>
-              <Button title="Take photo with camera" onPress={() => {handleImageTaker()}}/>
+              <Text style={styles.modalTitle}>
+                Would you like to select an image from library or take one?
+              </Text>
+              <Button
+                title="Select an image from library"
+                onPress={() => {
+                  handleImagePicker();
+                }}
+              />
+              <Button
+                title="Take photo with camera"
+                onPress={() => {
+                  handleImageTaker();
+                }}
+              />
               <Button title="Close" onPress={() => setModalVisible(false)} />
             </View>
-        </View>
+          </View>
         </Modal>
       </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <SafeAreaView>
-            <View style={styles.container}>
-              <TextInput style={styles.label} placeholder="LABEL" />
-              <TextInput style={styles.label} placeholder="AUDIO" />
-            </View>
-
-            {/* Save buttons container */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={() => {}} style={styles.saveButton}>
-                <XmarkSVG />
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          automaticallyAdjustKeyboardInsets
+        >
+          <SafeAreaView style={styles.cameraContainer}>
+            <View>
+              <TouchableOpacity
+                style={styles.camera}
+                onPress={() => {
+                  setModalVisible(true);
+                }}
+              >
+                {!base64Image && <CameraIcon />}
+                {base64Image && (
+                  <Image
+                    style={styles.image}
+                    source={{ uri: `data:image/jpeg;base64,${base64Image}` }}
+                  />
+                )}
               </TouchableOpacity>
             </View>
           </SafeAreaView>
-
-          <SafeAreaView>
-            <View style={styles.container}>
+          <SafeAreaView style={styles.container}>
+            <View style={styles.formContainer}>
               <TextInput
                 style={styles.label}
                 placeholder="LABEL"
@@ -130,10 +191,7 @@ const App = () => {
                   }}
                   style={styles.saveButton}
                 >
-                  <Image
-                    source={require("../../assets/icons/xmark-square.svg")} // Change to PNG or SVG handling
-                    style={styles.image}
-                  />
+                  <XmarkSVG />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => onSavePressed()}
@@ -214,29 +272,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center", // Center the icon within the button
   },
-    modalBackground: {
+  modalBackground: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
-    width: '80%',
-    backgroundColor: 'white',
+    width: "80%",
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   modalText: {
     fontSize: 16,
     marginBottom: 20,
   },
-    image: {
+  image: {
     height: 250,
     width: 250,
     top: 25,

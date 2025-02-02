@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import { useLocalSearchParams } from "expo-router";
 import {
   StyleSheet,
@@ -11,7 +11,6 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Actionbutton from "../action_button"; // Assuming you have this component imported
 import { useWindowDimensions } from "react-native";
-import ImageTaker from "../utilities/image_taker";
 
 import {
   SQLiteProvider,
@@ -19,9 +18,12 @@ import {
   type SQLiteDatabase,
   openDatabaseAsync,
 } from "expo-sqlite";
+import { getAllSpeechButton } from "../services/database-service";
+import speechButton from "../models/speech-button";
+import AddNewButton from "../add_new_button";
 
 const App = () => {
-  const { editMode } = useLocalSearchParams();
+  const { editMode } = useLocalSearchParams<{ editMode: string }>();
   const { width, height } = useWindowDimensions(); // Dynamically get window size
 
   const homeButtonLimit = 36;
@@ -31,9 +33,7 @@ const App = () => {
 
   action_names = action_names.slice(0, 36);
 
-  const [isEnabled, setIsEnabled] = useState(false);
-
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+  const [speechButtons, setSpeechButtons] = useState<Array<speechButton>>([]);
 
   const numColumns = 10; // You seem to want 12 buttons per row
   const buttonWidth = width / numColumns; // Dynamically set button width
@@ -61,6 +61,20 @@ const App = () => {
     }
   };
 
+  useEffect(() => {
+    const populateSpeechButtons = async () => {
+      const speechButtons = await getAllSpeechButton();
+
+      return speechButtons;
+    };
+
+    populateSpeechButtons().then((data) => setSpeechButtons(data));
+  }, []);
+
+  const isEditMode = () => {
+    return editMode?.toLowerCase() == "true";
+  };
+
   return (
     <SafeAreaProvider>
       <Suspense fallback={<Text>"Loading database..."</Text>}>
@@ -72,30 +86,35 @@ const App = () => {
           <ScrollView>
             <SafeAreaView style={styles.container}>
               <View style={styles.row}>
-                {action_names.map((action_name, index) => (
+                {speechButtons.map((speechButton, index) => (
                   <View
                     key={index}
                     style={[
-                      action_name != ""
+                      speechButton.label != ""
                         ? styles.buttonContainer
                         : styles.invisibleButtonContainer,
                       { width: buttonWidth },
                     ]}
                   >
-                    <Actionbutton name={action_name} />
+                    <Actionbutton
+                      item={speechButton}
+                      key={speechButton.id}
+                      editMode={isEditMode()}
+                    />
                   </View>
                 ))}
+                {isEditMode() ? (
+                  <View style={styles.row}>
+                    <AddNewButton />
+                  </View>
+                ) : (
+                  <></>
+                )}
               </View>
             </SafeAreaView>
           </ScrollView>
         </SQLiteProvider>
       </Suspense>
-
-      <View>
-        <TouchableOpacity onPress={toggleSwitch}>
-          <Text>EDIT/DEBUG {isEnabled ? "True" : "False"}</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaProvider>
   );
 };
