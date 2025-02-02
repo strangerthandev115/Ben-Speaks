@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
+import { useLocalSearchParams } from "expo-router";
 import {
   StyleSheet,
   View,
@@ -10,46 +11,85 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Actionbutton from "../action_button"; // Assuming you have this component imported
 import { useWindowDimensions } from "react-native";
-import  ImageTaker  from "../utilities/image_taker"
+import ImageTaker from "../utilities/image_taker";
+
+import {
+  SQLiteProvider,
+  useSQLiteContext,
+  type SQLiteDatabase,
+  openDatabaseAsync,
+} from "expo-sqlite";
 
 const App = () => {
+  const { editMode } = useLocalSearchParams();
   const { width, height } = useWindowDimensions(); // Dynamically get window size
 
-  const homeButtonLimit = 44;
+  const homeButtonLimit = 36;
 
   let action_names = new Array(homeButtonLimit).fill("");
   action_names[0] = "WATER";
 
-  action_names = action_names.slice(0, 44);
+  action_names = action_names.slice(0, 36);
 
   const [isEnabled, setIsEnabled] = useState(false);
 
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
-  const numColumns = 12; // You seem to want 12 buttons per row
+  const numColumns = 10; // You seem to want 12 buttons per row
   const buttonWidth = width / numColumns; // Dynamically set button width
+
+  const migrateDbIfNeeded = async (db: SQLiteDatabase) => {
+    const DATABASE_VERSION = 1; //Increase by 1 after you add new migration
+    let user_version = await db.getFirstAsync<{
+      user_version: number;
+    }>("PRAGMA user_version");
+    console.log(user_version);
+    if (user_version != null) {
+      let currentDbVersion = user_version.user_version;
+
+      if (currentDbVersion >= DATABASE_VERSION) {
+        return;
+      }
+      if (currentDbVersion === 0) {
+        await db.execAsync(`
+  PRAGMA journal_mode = 'wal';
+  CREATE TABLE speech_button (id INTEGER PRIMARY KEY NOT NULL, label TEXT NOT NULL, speech_phrase TEXT NOT NULL, image BLOB);
+  `);
+        currentDbVersion = 1;
+      }
+      await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+    }
+  };
 
   return (
     <SafeAreaProvider>
-      <ScrollView>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.row}>
-            {action_names.map((action_name, index) => (
-              <View
-                key={index}
-                style={[
-                  action_name != ""
-                    ? styles.buttonContainer
-                    : styles.invisibleButtonContainer,
-                  { width: buttonWidth },
-                ]}
-              >
-                <Actionbutton name={action_name} />
+      <Suspense fallback={<Text>"Loading database..."</Text>}>
+        <SQLiteProvider
+          databaseName="test.db"
+          onInit={migrateDbIfNeeded}
+          useSuspense
+        >
+          <ScrollView>
+            <SafeAreaView style={styles.container}>
+              <View style={styles.row}>
+                {action_names.map((action_name, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      action_name != ""
+                        ? styles.buttonContainer
+                        : styles.invisibleButtonContainer,
+                      { width: buttonWidth },
+                    ]}
+                  >
+                    <Actionbutton name={action_name} />
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
-        </SafeAreaView>
-      </ScrollView>
+            </SafeAreaView>
+          </ScrollView>
+        </SQLiteProvider>
+      </Suspense>
 
       <View>
         <TouchableOpacity onPress={toggleSwitch}>
