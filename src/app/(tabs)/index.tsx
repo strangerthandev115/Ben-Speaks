@@ -100,6 +100,13 @@ const App = () => {
           <ScrollView>
             <SafeAreaView style={styles.container}>
               <View style={styles.row}>
+                {isEditMode() ? (
+                  <View style={{ paddingTop: 10 }}>
+                    <AddNewButton />
+                  </View>
+                ) : (
+                  <></>
+                )}
                 {speechButtons.map((speechButton, index) => (
                   <View
                     key={index}
@@ -117,13 +124,6 @@ const App = () => {
                     />
                   </View>
                 ))}
-                {isEditMode() ? (
-                  <View style={styles.row}>
-                    <AddNewButton />
-                  </View>
-                ) : (
-                  <></>
-                )}
               </View>
             </SafeAreaView>
           </ScrollView>

@@ -65,8 +65,7 @@ const Actionbutton = ({ item, editMode = false }: Props) => {
           <></>
         )}
       </TouchableOpacity>
-      <View>
-        <Text style={styles.text}>{item.label}</Text>
+      <View style={{ flexDirection: "row", padding: 10 }}>
         {editMode ? (
           <TouchableOpacity
             onPress={() => deleteSpeechButtonAfterConfirmation()}
@@ -77,6 +76,7 @@ const Actionbutton = ({ item, editMode = false }: Props) => {
         ) : (
           <></>
         )}
+        <Text style={styles.text}>{item.label}</Text>
       </View>
     </View>
   );
@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textDecorationStyle: "double",
     fontSize: 15, // Adjusted font size for visibility
+    marginLeft: 10,
   },
   image: {
     height: "70%", // Adjust height to fit inside the button (scaling)
