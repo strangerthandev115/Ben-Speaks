@@ -1,69 +1,40 @@
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Image, View, StyleSheet } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
-export default function ImageTaker() {
-  const [facing, setFacing] = useState<CameraType>('back');
-  const [permission, requestPermission] = useCameraPermissions();
-
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
+export default async function ImageTaker(): Promise<string | null> {
+  //const [image, setImage] = useState<string | null>(null);
+  //const [base64Image, setBase64Image] = useState<string | null>(null);
+  const pickImage = async () => {
+  const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permissionResult.granted) {
+    throw new Error("Permission to access media library is required!");
   }
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      base64: true
+    });
 
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
+    console.log(result);
+
+    if (!result.canceled) {
+      const asset = result.assets[0];
+      //setImage(asset.uri)
+      //setBase64Image(asset.base64 || null);
+      return asset.base64
+    }
+    //console.log(base64Image)
+  };
+  
+  let base64Image = await pickImage();
+  if(base64Image){
+    return base64Image;
   }
-
-  function toggleCameraFacing() {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  else{
+    return null;
   }
-
-  return (
-    <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity>
-        </View>
-      </CameraView>
-    </View>
-  );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  message: {
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-});

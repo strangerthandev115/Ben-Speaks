@@ -11,7 +11,6 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Actionbutton from "../action_button"; // Assuming you have this component imported
 import { useWindowDimensions } from "react-native";
-import ImageTaker from "../utilities/image_taker";
 
 import {
   SQLiteProvider,
@@ -116,10 +115,6 @@ const App = () => {
           </ScrollView>
         </SQLiteProvider>
       </Suspense>
-
-      <View>
-        <ImageTaker />
-      </View>
     </SafeAreaProvider>
   );
 };
