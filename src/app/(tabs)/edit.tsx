@@ -126,7 +126,11 @@ import {
   Platform,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import Actionbutton from "../action_button";
 import { Dimensions } from "react-native";
+import ImageTaker from "../utilities/image_taker"
+import ImageGetter from "../utilities/image_picker"
+import CameraIcon from "@/assets/icons/camera";
 import CheckmarkSVG from "@/assets/icons/checkmark";
 
 const windowWidth = Dimensions.get("window").width;
@@ -134,6 +138,23 @@ const windowHeight = Dimensions.get("window").height;
 
 const App = () => (
   <SafeAreaProvider>
+    <SafeAreaView style={styles.cameraContainer}>
+      <View>
+        <TouchableOpacity style={styles.camera} onPress={() => {}}>
+        <CameraIcon/>
+        </TouchableOpacity>
+
+      </View>
+    </SafeAreaView>
+
+    <View></View>
+
+    <SafeAreaView>
+      <View style={styles.container}>
+        <TextInput style={styles.label} placeholder="LABEL" />
+        <TextInput style={styles.label} placeholder="AUDIO" />
+      </View>
+    </SafeAreaView>
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
